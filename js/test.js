@@ -30,7 +30,7 @@
     heroReady = true;
   };
 
-  heroImage.src = "images/Starfighter.png";
+  heroImage.src = "images/Noahs Starfighter.png";
 
   monsterReady = false;
 

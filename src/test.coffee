@@ -16,7 +16,7 @@ heroImage = new Image()
 heroImage.onload = ->
     heroReady = true
     return
-heroImage.src = "images/Starfighter.png"
+heroImage.src = "images/Noahs Starfighter.png"
 
 monsterReady = false
 
