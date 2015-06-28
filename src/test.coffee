@@ -1,6 +1,6 @@
 canvas = document.createElement("canvas")
 ctx = canvas.getContext("2d")
-canvas.width = 512
+canvas.width = 640
 canvas.height = 480
 document.body.appendChild(canvas)
 
@@ -27,7 +27,7 @@ monsterImage.onload = ->
 monsterImage.src = "images/StandardEnemyShip.png"
 
 hero =
-    speed: 256
+    speed: 320
 monster = {}
 monstersCaught = 0
 
