@@ -1,7 +1,11 @@
 # What is a click handler
 
-@playerX = 1
-@playerY = 1
+# I need a way to sync the x,y position of an object and the grid
+# What I'm going to do is use the grid as a visual representaion of each object, only being an array that need to be populated with objects x's and y's. Each object will hold their own x,y values and check for another object with the x,y values that they're evaluating
+
+# These should eventually provide a random valid output on the grid
+playerX = 1 
+playerY = 1 
 
 GridCodes =
     floor : 0
@@ -10,13 +14,20 @@ GridCodes =
     player : "P"
     enemy : "E"
 
-class Player
-    constructor: (name, type) ->
-        @name = name
-        @type = type
-        @x = @playerX
-        @y = @playerY
+class Actor
+    constructor:(@x,@y) ->
         return
+
+    toGridSpace: ->
+        return
+    
+class Player extends Actor
+    constructor: (@name, @type) ->
+        super(playerX,playerY)
+        return
+
+    toGridSpace: ->
+        return GridCodes.player
 
     getName: ->
         "#{@name} the #{@type}"
@@ -25,39 +36,59 @@ class Player
         @type
 
 class GridSpace
-    constructor: (type, x, y) ->
-        @x = x
-        @y = y
-        @type = type
+    size: 30
+    constructor: (@x, @y, @object) ->
 
-    setType: (type) ->
-        @type = type
+    setObject: (@object) ->
 
-    checkSpace: ->
-        return @type
+    getSpace: ->
+        return @object
 
-class Level
-    constructor: (maxWidth, maxHeight) ->
-        @maxWidth = maxWidth
-        @maxHeight = maxHeight
-        @grid = for x in [0...maxWidth]
-            for y in [0...maxHeight]
-                new GridSpace(GridCodes.wall,x,y)
+    draw: (x,y) ->
+        x *= @size
+        y *= @size
+        if floorReady
+            ctx.drawImage(floorImage, x, y)
+        if wallReady
+            ctx.drawImage(wallImage, x, y)
+        if playerReady
+            ctx.drawImage(playerImage, x, y)
+        ctx.fillStyle = "rgb(250,250,250)"
+        ctx.font = "24px Helvetica"
+        ctx.textAlign = "left"
+        ctx.textBaseline = "top"
+        return
 
-    checkGridSpace: (x,y) ->
-        return @grid[x][y].checkSpace
+class Grid
+    constructor: (@maxWidth, @maxHeight) ->
+        @grid = for x in [0...@maxWidth]
+            for y in [0...@maxHeight]
+                new GridSpace(x,y,GridCodes.wall)
+        return
 
-    emptyLevel: ->
+    getGridSpace: (x,y) ->
+        return @grid[x][y].getSpace()
+
+    emptyGrid: ->
         for space in @grid
             if space.x > 0 and space.x < @maxWidth
                 if space.y > 0 and space.y < @maxHeight
-                    space.setType(GridCodes.floor)
-        @grid[@playerX][@playerY].setType(GridCodes.player)
-     
+                    space.setObject(GridCodes.floor)
+        return
 
+    populateGrid: (actors) ->
+        this.emptyGrid()
+        for actor in actors
+            @grid[actor.x][actor.y].setObject(actor.toGridSpace())
+        return
+            
 hero = new Player("Nogrelin", "Death Knight")
-level = new Level(5,5)
+grid = new Grid(5,5)
 
+actors = [
+    hero
+    #enemy
+    ]
 
 canvas = document.createElement("canvas")
 ctx = canvas.getContext("2d")
@@ -70,21 +101,22 @@ floorImage = new Image()
 floorImage.onload = ->
     floorReady = true
     return
-floorImage.src = "images/Floor.png"
+floorImage.src = "images/StandardEnemyship.png" #Floor
 
 wallReady = false
 wallImage = new Image()
 wallImage.onload = ->
     wallReady = true
     return
-wallImage.src = "images/Wall.png"
+wallImage.src = "images/Noahs Starfighter.png" #Wall
 
 playerReady = false
 playerImage = new Image()
 playerImage.onload = ->
     playerReady = true
     return
-playerImage.src = "images/Player.png"
+playerImage.src = "images/Starfighter.png" #Player
+
 
 keysDown = {}
 
@@ -99,15 +131,51 @@ addEventListener("keyup", (e)->
     ,false)
 
 update = ->
+    # move player
+    # get space you want to move to for emptiness and move or else dont
     if 38 of keysDown
-        if level.checkGridSpace(player.x,player.y-1) == GridCodes.floor
-            player.y -= 1
+        if grid.getSpace(hero.x, hero.y-1) == GridCodes.floor
+            hero.y-=1
     if 40 of keysDown
-        if level.checkGridSpace(player.x,player.y+1) == GridCodes.floor
-            player.y += 1
+        if grid.getSpace(hero.x, hero.y+1) == GridCodes.floor
+            hero.y+=1
     if 37 of keysDown
-        if level.checkGridSpace(player.x-1,player.y) == GridCodes.floor
-            player.x -= 1
+        if grid.getSpace(hero.x-1, hero.y) == GridCodes.floor
+            hero.x-=1
     if 39 of keysDown
-        if level.checkGridSpace(player.x+1,player.y-1) == GridCodes.floor
-            player.x += 1
+        if grid.getSpace(hero.x+1, hero.y) == GridCodes.floor
+            hero.x+=1
+    return
+
+render = ->
+    # draw the 3x3 grid area around the hero
+    grid.emptyGrid()
+    grid.populateGrid(actors)
+
+    # should be: draw background (floor and walls)
+    for i in [hero.x-1..hero.x+1]
+        for j in [hero.y-1..hero.y+1]
+            grid.grid[i][j].draw((i-(hero.x-1)),(j-(hero.y-1)))
+
+    # then: draw actors ontop of current layer
+    return
+
+main = ->
+    now = Date.now()
+    delta = now-previousTime
+
+    update(delta / 1000)
+    render()
+
+    @previousTime = now
+
+    requestAnimationFrame(main)
+
+    return
+
+w = window
+requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame
+
+@previousTime = Date.now()
+
+main()
