@@ -123,6 +123,7 @@ playerImage.src = "images/Starfighter.png" #Player
 
 
 keysDown = {}
+actionAvailable = true
 
 addEventListener("keydown", (e)->
         keysDown[e.keyCode] = true
@@ -130,6 +131,7 @@ addEventListener("keydown", (e)->
     ,false)
 
 addEventListener("keyup", (e)->
+        actionAvailable = true
         delete keysDown[e.keyCode]
         return
     ,false)
@@ -137,18 +139,22 @@ addEventListener("keyup", (e)->
 update = ->
     # move player
     # get space you want to move to for emptiness and move or else dont
-    if 38 of keysDown
+    if 38 of keysDown && actionAvailable
         if grid.getGridSpace(hero.x, hero.y-1) == GridCodes.floor
             hero.y-=1
-    if 40 of keysDown
+        actionAvailable = false
+    if 40 of keysDown && actionAvailable
         if grid.getGridSpace(hero.x, hero.y+1) == GridCodes.floor
             hero.y+=1
-    if 37 of keysDown
+        actionAvailable = false            
+    if 37 of keysDown && actionAvailable
         if grid.getGridSpace(hero.x-1, hero.y) == GridCodes.floor
             hero.x-=1
-    if 39 of keysDown
+        actionAvailable = false            
+    if 39 of keysDown && actionAvailable
         if grid.getGridSpace(hero.x+1, hero.y) == GridCodes.floor
             hero.x+=1
+        actionAvailable = false                
     return
 
 render = ->
