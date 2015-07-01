@@ -44,21 +44,6 @@ class GridSpace
     getSpace: ->
         return @object
 
-    draw: (x,y) ->
-        x *= @size
-        y *= @size
-        if floorReady
-            ctx.drawImage(floorImage, x, y)
-        if wallReady
-            ctx.drawImage(wallImage, x, y)
-        if playerReady
-            ctx.drawImage(playerImage, x, y)
-        ctx.fillStyle = "rgb(250,250,250)"
-        ctx.font = "24px Helvetica"
-        ctx.textAlign = "left"
-        ctx.textBaseline = "top"
-        return
-
 class Grid
     constructor: (@maxWidth, @maxHeight) ->
         @grid = for x in [0...@maxWidth]
@@ -70,10 +55,9 @@ class Grid
         return @grid[x][y].getSpace()
 
     emptyGrid: ->
-        for space in @grid
-            if space.x > 0 and space.x < @maxWidth
-                if space.y > 0 and space.y < @maxHeight
-                    space.setObject(GridCodes.floor)
+        for x in [1...@maxWidth-1]
+            for y in [1...@maxHeight-1]
+                @grid[x][y].setObject(GridCodes.floor)
         return
 
     populateGrid: (actors) ->
@@ -81,6 +65,26 @@ class Grid
         for actor in actors
             @grid[actor.x][actor.y].setObject(actor.toGridSpace())
         return
+
+    draw: (x,y) ->
+        i = x * @grid[0][0].size
+        j = y * @grid[0][0].size
+        switch @grid[x][y].getSpace()
+            when GridCodes.floor
+                if floorReady
+                    ctx.drawImage(floorImage, i, j)
+            when GridCodes.wall 
+                if wallReady
+                    ctx.drawImage(wallImage, i, j)
+            when GridCodes.player
+                if playerReady
+                    ctx.drawImage(playerImage, i, j)
+        ctx.fillStyle = "rgb(250,250,250)"
+        ctx.font = "24px Helvetica"
+        ctx.textAlign = "left"
+        ctx.textBaseline = "top"
+        return
+        
             
 hero = new Player("Nogrelin", "Death Knight")
 grid = new Grid(5,5)
@@ -134,16 +138,16 @@ update = ->
     # move player
     # get space you want to move to for emptiness and move or else dont
     if 38 of keysDown
-        if grid.getSpace(hero.x, hero.y-1) == GridCodes.floor
+        if grid.getGridSpace(hero.x, hero.y-1) == GridCodes.floor
             hero.y-=1
     if 40 of keysDown
-        if grid.getSpace(hero.x, hero.y+1) == GridCodes.floor
+        if grid.getGridSpace(hero.x, hero.y+1) == GridCodes.floor
             hero.y+=1
     if 37 of keysDown
-        if grid.getSpace(hero.x-1, hero.y) == GridCodes.floor
+        if grid.getGridSpace(hero.x-1, hero.y) == GridCodes.floor
             hero.x-=1
     if 39 of keysDown
-        if grid.getSpace(hero.x+1, hero.y) == GridCodes.floor
+        if grid.getGridSpace(hero.x+1, hero.y) == GridCodes.floor
             hero.x+=1
     return
 
@@ -153,9 +157,13 @@ render = ->
     grid.populateGrid(actors)
 
     # should be: draw background (floor and walls)
-    for i in [hero.x-1..hero.x+1]
-        for j in [hero.y-1..hero.y+1]
-            grid.grid[i][j].draw((i-(hero.x-1)),(j-(hero.y-1)))
+    for i in [0..grid.maxWidth-1]
+        for j in [0..grid.maxHeight-1]
+            grid.draw(i,j) 
+  
+    #for i in [hero.x-1..hero.x+1]
+    #     for j in [hero.y-1..hero.y+1]
+    #     grid.draw((i-(hero.x-1)),(j-(hero.y-1)))
 
     # then: draw actors ontop of current layer
     return

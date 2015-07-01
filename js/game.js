@@ -72,24 +72,6 @@
       return this.object;
     };
 
-    GridSpace.prototype.draw = function(x, y) {
-      x *= this.size;
-      y *= this.size;
-      if (floorReady) {
-        ctx.drawImage(floorImage, x, y);
-      }
-      if (wallReady) {
-        ctx.drawImage(wallImage, x, y);
-      }
-      if (playerReady) {
-        ctx.drawImage(playerImage, x, y);
-      }
-      ctx.fillStyle = "rgb(250,250,250)";
-      ctx.font = "24px Helvetica";
-      ctx.textAlign = "left";
-      ctx.textBaseline = "top";
-    };
-
     return GridSpace;
 
   })();
@@ -122,14 +104,10 @@
     };
 
     Grid.prototype.emptyGrid = function() {
-      var k, len, ref, space;
-      ref = this.grid;
-      for (k = 0, len = ref.length; k < len; k++) {
-        space = ref[k];
-        if (space.x > 0 && space.x < this.maxWidth) {
-          if (space.y > 0 && space.y < this.maxHeight) {
-            space.setObject(GridCodes.floor);
-          }
+      var k, l, ref, ref1, x, y;
+      for (x = k = 1, ref = this.maxWidth - 1; 1 <= ref ? k < ref : k > ref; x = 1 <= ref ? ++k : --k) {
+        for (y = l = 1, ref1 = this.maxHeight - 1; 1 <= ref1 ? l < ref1 : l > ref1; y = 1 <= ref1 ? ++l : --l) {
+          this.grid[x][y].setObject(GridCodes.floor);
         }
       }
     };
@@ -141,6 +119,32 @@
         actor = actors[k];
         this.grid[actor.x][actor.y].setObject(actor.toGridSpace());
       }
+    };
+
+    Grid.prototype.draw = function(x, y) {
+      var i, j;
+      i = x * this.grid[0][0].size;
+      j = y * this.grid[0][0].size;
+      switch (this.grid[x][y].getSpace()) {
+        case GridCodes.floor:
+          if (floorReady) {
+            ctx.drawImage(floorImage, i, j);
+          }
+          break;
+        case GridCodes.wall:
+          if (wallReady) {
+            ctx.drawImage(wallImage, i, j);
+          }
+          break;
+        case GridCodes.player:
+          if (playerReady) {
+            ctx.drawImage(playerImage, i, j);
+          }
+      }
+      ctx.fillStyle = "rgb(250,250,250)";
+      ctx.font = "24px Helvetica";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
     };
 
     return Grid;
@@ -205,34 +209,34 @@
 
   update = function() {
     if (38 in keysDown) {
-      if (grid.getSpace(hero.x, hero.y - 1) === GridCodes.floor) {
+      if (grid.getGridSpace(hero.x, hero.y - 1) === GridCodes.floor) {
         hero.y -= 1;
       }
     }
     if (40 in keysDown) {
-      if (grid.getSpace(hero.x, hero.y + 1) === GridCodes.floor) {
+      if (grid.getGridSpace(hero.x, hero.y + 1) === GridCodes.floor) {
         hero.y += 1;
       }
     }
     if (37 in keysDown) {
-      if (grid.getSpace(hero.x - 1, hero.y) === GridCodes.floor) {
+      if (grid.getGridSpace(hero.x - 1, hero.y) === GridCodes.floor) {
         hero.x -= 1;
       }
     }
     if (39 in keysDown) {
-      if (grid.getSpace(hero.x + 1, hero.y) === GridCodes.floor) {
+      if (grid.getGridSpace(hero.x + 1, hero.y) === GridCodes.floor) {
         hero.x += 1;
       }
     }
   };
 
   render = function() {
-    var i, j, k, l, ref, ref1, ref2, ref3;
+    var i, j, k, l, ref, ref1;
     grid.emptyGrid();
     grid.populateGrid(actors);
-    for (i = k = ref = hero.x - 1, ref1 = hero.x + 1; ref <= ref1 ? k <= ref1 : k >= ref1; i = ref <= ref1 ? ++k : --k) {
-      for (j = l = ref2 = hero.y - 1, ref3 = hero.y + 1; ref2 <= ref3 ? l <= ref3 : l >= ref3; j = ref2 <= ref3 ? ++l : --l) {
-        grid.grid[i][j].draw(i - (hero.x - 1), j - (hero.y - 1));
+    for (i = k = 0, ref = grid.maxWidth - 1; 0 <= ref ? k <= ref : k >= ref; i = 0 <= ref ? ++k : --k) {
+      for (j = l = 0, ref1 = grid.maxHeight - 1; 0 <= ref1 ? l <= ref1 : l >= ref1; j = 0 <= ref1 ? ++l : --l) {
+        grid.draw(i, j);
       }
     }
   };
