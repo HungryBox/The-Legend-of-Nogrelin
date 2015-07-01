@@ -231,11 +231,12 @@
   };
 
   render = function() {
-    var i, j, k, l, ref, ref1;
+    var i, j, k, l, ref, ref1, ref2, ref3;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     grid.emptyGrid();
     grid.populateGrid(actors);
-    for (i = k = 0, ref = grid.maxWidth - 1; 0 <= ref ? k <= ref : k >= ref; i = 0 <= ref ? ++k : --k) {
-      for (j = l = 0, ref1 = grid.maxHeight - 1; 0 <= ref1 ? l <= ref1 : l >= ref1; j = 0 <= ref1 ? ++l : --l) {
+    for (i = k = ref = hero.x - 1, ref1 = hero.x + 1; ref <= ref1 ? k <= ref1 : k >= ref1; i = ref <= ref1 ? ++k : --k) {
+      for (j = l = ref2 = hero.y - 1, ref3 = hero.y + 1; ref2 <= ref3 ? l <= ref3 : l >= ref3; j = ref2 <= ref3 ? ++l : --l) {
         grid.draw(i, j);
       }
     }

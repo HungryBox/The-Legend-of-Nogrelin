@@ -152,18 +152,20 @@ update = ->
     return
 
 render = ->
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
     # draw the 3x3 grid area around the hero
     grid.emptyGrid()
     grid.populateGrid(actors)
 
     # should be: draw background (floor and walls)
-    for i in [0..grid.maxWidth-1]
-        for j in [0..grid.maxHeight-1]
-            grid.draw(i,j) 
+    # for i in [0..grid.maxWidth-1]
+    #     for j in [0..grid.maxHeight-1]
+    #         grid.draw(i,j) 
   
-    #for i in [hero.x-1..hero.x+1]
-    #     for j in [hero.y-1..hero.y+1]
-    #     grid.draw((i-(hero.x-1)),(j-(hero.y-1)))
+    for i in [hero.x-1..hero.x+1]
+        for j in [hero.y-1..hero.y+1]
+            grid.draw(i,j)
 
     # then: draw actors ontop of current layer
     return
