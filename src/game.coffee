@@ -101,14 +101,14 @@ floorImage = new Image()
 floorImage.onload = ->
     floorReady = true
     return
-floorImage.src = "images/StandardEnemyship.png" #Floor
+floorImage.src = "images/Floor.png" #Floor
 
 wallReady = false
 wallImage = new Image()
 wallImage.onload = ->
     wallReady = true
     return
-wallImage.src = "images/Noahs Starfighter.png" #Wall
+wallImage.src = "images/Wall.png" #Wall
 
 playerReady = false
 playerImage = new Image()

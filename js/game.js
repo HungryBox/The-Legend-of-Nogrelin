@@ -171,7 +171,7 @@
     floorReady = true;
   };
 
-  floorImage.src = "images/StandardEnemyship.png";
+  floorImage.src = "images/Floor.png";
 
   wallReady = false;
 
@@ -181,7 +181,7 @@
     wallReady = true;
   };
 
-  wallImage.src = "images/Noahs Starfighter.png";
+  wallImage.src = "images/Wall.png";
 
   playerReady = false;
 
