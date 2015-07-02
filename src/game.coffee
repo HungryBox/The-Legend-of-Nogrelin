@@ -36,7 +36,7 @@ class Player extends Actor
         @type
 
 class GridSpace
-    size: 30
+    size: 128
     constructor: (@x, @y, @object) ->
 
     setObject: (@object) ->
@@ -79,10 +79,6 @@ class Grid
             when GridCodes.player
                 if playerReady
                     ctx.drawImage(playerImage, i, j)
-        ctx.fillStyle = "rgb(250,250,250)"
-        ctx.font = "24px Helvetica"
-        ctx.textAlign = "left"
-        ctx.textBaseline = "top"
         return
         
             
@@ -96,8 +92,8 @@ actors = [
 
 canvas = document.createElement("canvas")
 ctx = canvas.getContext("2d")
-canvas.width = 640 # 5 units across
-canvas.height = 480 # 5 units tall
+canvas.width = window.innerWidth# 640
+canvas.height = window.innerHeight# 480
 document.body.appendChild(canvas)
 
 floorReady = false
@@ -119,7 +115,7 @@ playerImage = new Image()
 playerImage.onload = ->
     playerReady = true
     return
-playerImage.src = "images/Starfighter.png" #Player
+playerImage.src = "images/Nogrelin.png" #Player
 
 
 keysDown = {}

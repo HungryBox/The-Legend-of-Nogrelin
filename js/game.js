@@ -56,7 +56,7 @@
   })(Actor);
 
   GridSpace = (function() {
-    GridSpace.prototype.size = 30;
+    GridSpace.prototype.size = 128;
 
     function GridSpace(x1, y1, object) {
       this.x = x1;
@@ -141,10 +141,6 @@
             ctx.drawImage(playerImage, i, j);
           }
       }
-      ctx.fillStyle = "rgb(250,250,250)";
-      ctx.font = "24px Helvetica";
-      ctx.textAlign = "left";
-      ctx.textBaseline = "top";
     };
 
     return Grid;
@@ -161,9 +157,9 @@
 
   ctx = canvas.getContext("2d");
 
-  canvas.width = 640;
+  canvas.width = window.innerWidth;
 
-  canvas.height = 480;
+  canvas.height = window.innerHeight;
 
   document.body.appendChild(canvas);
 
@@ -195,7 +191,7 @@
     playerReady = true;
   };
 
-  playerImage.src = "images/Starfighter.png";
+  playerImage.src = "images/Nogrelin.png";
 
   keysDown = {};
 
