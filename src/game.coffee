@@ -83,7 +83,7 @@ class Grid
         
             
 hero = new Player("Nogrelin", "Death Knight")
-grid = new Grid(5,5)
+grid = new Grid(7,7)
 
 actors = [
     hero
