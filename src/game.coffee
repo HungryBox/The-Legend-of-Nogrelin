@@ -16,7 +16,6 @@ GridCodes =
 class Actor
     constructor:(@x,@y) ->
         return
-
     toGridSpace: ->
         return
     
@@ -25,13 +24,10 @@ class Player extends Actor
     constructor: (@name, @type, @x, @y) ->
         super(@x, @y)
         return
-
     toGridSpace: ->
         return GridCodes.player
-
     getName: ->
         "#{@name} the #{@type}"
-
     getType: ->
         @type
 
@@ -39,10 +35,8 @@ class Enemy extends Actor
     constructor: (@name, @type,@x,@y) ->
         super(@x,@y)
         return
-
     getName: ->
         "#{@name} the #{@type}"
-
     getType: ->
         @type
 
@@ -50,16 +44,13 @@ class Ogre extends Enemy
     constructor: (@name,@x,@y)->
         super(@name, GridCodes.ogre, @x, @y)
         return
-
     toGridSpace: ->
         return GridCodes.ogre
 
 class GridSpace
     size: 128
     constructor: (@x, @y, @object) ->
-
     setObject: (@object) ->
-
     getSpace: ->
         return @object
 
@@ -69,29 +60,23 @@ class Grid
             for y in [0...@maxHeight]
                 new GridSpace(x,y,GridCodes.wall)
         return
-
     getGridSpace: (x,y) ->
         return @grid[x][y].getSpace()
-
     emptyGrid: ->
         for x in [1...@maxWidth-1]
             for y in [1...@maxHeight-1]
                 @grid[x][y].setObject(GridCodes.floor)
         return
-
     populateGrid: (actors) ->
         this.emptyGrid()
         for actor in actors
             @grid[actor.x][actor.y].setObject(actor.toGridSpace())
         return
-
     draw: (x,y,xmin, ymin) ->
         i = (x-xmin) * @grid[0][0].size
         j = (y-ymin) * @grid[0][0].size
-
         if floorReady
-            ctx.drawImage(floorImage,i,j)
-        
+            ctx.drawImage(floorImage,i,j)        
         switch @grid[x][y].getSpace()
             when GridCodes.ogre
                 if ogreReady
@@ -102,11 +87,10 @@ class Grid
             when GridCodes.player
                 if playerReady
                     ctx.drawImage(playerImage, i, j)
-        return
-        
+        return        
             
 hero = new Player("Nogrelin", "Death Knight", 1, 1)
-ogre = new Ogre("Ogrelin", 3,3)
+ogre = new Ogre("Ogrelin",2,2)
 grid = new Grid(7,7)
 
 actors = [
@@ -116,8 +100,8 @@ actors = [
 
 canvas = document.createElement("canvas")
 ctx = canvas.getContext("2d")
-canvas.width = window.innerWidth-20# 640
-canvas.height = window.innerHeight-20# 480
+canvas.width = (hero.seeRange*2+1)*128
+canvas.height = (hero.seeRange*2+1)*128
 document.body.appendChild(canvas)
 
 floorReady = false
@@ -149,7 +133,8 @@ ogreImage.onload = ->
 ogreImage.src = "images/Ogre.png" #Ogre
 
 keysDown = {}
-actionAvailable = true
+playerActionAvailable = true
+enemyActionAvailable = true
 
 addEventListener("keydown", (e)->
         keysDown[e.keyCode] = true
@@ -157,7 +142,8 @@ addEventListener("keydown", (e)->
     ,false)
 
 addEventListener("keyup", (e)->
-        actionAvailable = true
+        playerActionAvailable = true
+        enemyActionAvailable = true
         delete keysDown[e.keyCode]
         return
     ,false)
@@ -165,24 +151,43 @@ addEventListener("keyup", (e)->
 update = ->
     # move player
     # get space you want to move to for emptiness and move or else dont
-    if 38 of keysDown && actionAvailable
+    if 38 of keysDown && playerActionAvailable
         if grid.getGridSpace(hero.x, hero.y-1) == GridCodes.floor
             hero.y-=1
-        actionAvailable = false
-    if 40 of keysDown && actionAvailable
+        playerActionAvailable = false
+    if 40 of keysDown && playerActionAvailable
         if grid.getGridSpace(hero.x, hero.y+1) == GridCodes.floor
             hero.y+=1
-        actionAvailable = false            
-    if 37 of keysDown && actionAvailable
+        playerActionAvailable = false            
+    if 37 of keysDown && playerActionAvailable
         if grid.getGridSpace(hero.x-1, hero.y) == GridCodes.floor
             hero.x-=1
-        actionAvailable = false            
-    if 39 of keysDown && actionAvailable
+        playerActionAvailable = false            
+    if 39 of keysDown && playerActionAvailable
         if grid.getGridSpace(hero.x+1, hero.y) == GridCodes.floor
             hero.x+=1
-        actionAvailable = false                
-    return
+            playerActionAvailable = false                
 
+    if enemyActionAvailable
+        num = Math.floor(Math.random()*4+1)
+        switch num
+            when 1
+                if grid.getGridSpace(ogre.x, ogre.y-1) == GridCodes.floor
+                    ogre.y-=1
+                enemyActionAvailable = false
+            when 2
+                if grid.getGridSpace(ogre.x, ogre.y+1) == GridCodes.floor
+                    ogre.y+=1
+                enemyActionAvailable = false
+            when 3
+                if grid.getGridSpace(ogre.x-1, ogre.y) == GridCodes.floor
+                    ogre.x-=1
+                enemyActionAvailable = false
+            when 4
+                if grid.getGridSpace(ogre.x+1, ogre.y) == GridCodes.floor
+                    ogre.x+=1
+                enemyActionAvailable = false
+    return
 render = ->
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
