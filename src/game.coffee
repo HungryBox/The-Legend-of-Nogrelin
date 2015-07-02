@@ -3,16 +3,15 @@
 # I need a way to sync the x,y position of an object and the grid
 # What I'm going to do is use the grid as a visual representaion of each object, only being an array that need to be populated with objects x's and y's. Each object will hold their own x,y values and check for another object with the x,y values that they're evaluating
 
-# These should eventually provide a random valid output on the grid
-playerX = 1 
-playerY = 1 
+# TODO
+    # Consolidate object, type, and gridcode when necessary
 
 GridCodes =
     floor : 0
     wall : 1
     door : 2
     player : "P"
-    enemy : "E"
+    ogre : "O"
 
 class Actor
     constructor:(@x,@y) ->
@@ -22,8 +21,9 @@ class Actor
         return
     
 class Player extends Actor
-    constructor: (@name, @type) ->
-        super(playerX,playerY)
+    seeRange: 1
+    constructor: (@name, @type, @x, @y) ->
+        super(@x, @y)
         return
 
     toGridSpace: ->
@@ -34,6 +34,25 @@ class Player extends Actor
 
     getType: ->
         @type
+
+class Enemy extends Actor
+    constructor: (@name, @type,@x,@y) ->
+        super(@x,@y)
+        return
+
+    getName: ->
+        "#{@name} the #{@type}"
+
+    getType: ->
+        @type
+
+class Ogre extends Enemy
+    constructor: (@name,@x,@y)->
+        super(@name, GridCodes.ogre, @x, @y)
+        return
+
+    toGridSpace: ->
+        return GridCodes.ogre
 
 class GridSpace
     size: 128
@@ -66,13 +85,17 @@ class Grid
             @grid[actor.x][actor.y].setObject(actor.toGridSpace())
         return
 
-    draw: (x,y) ->
-        i = x * @grid[0][0].size
-        j = y * @grid[0][0].size
+    draw: (x,y,xmin, ymin) ->
+        i = (x-xmin) * @grid[0][0].size
+        j = (y-ymin) * @grid[0][0].size
+
+        if floorReady
+            ctx.drawImage(floorImage,i,j)
+        
         switch @grid[x][y].getSpace()
-            when GridCodes.floor
-                if floorReady
-                    ctx.drawImage(floorImage, i, j)
+            when GridCodes.ogre
+                if ogreReady
+                    ctx.drawImage(ogreImage, i, j)
             when GridCodes.wall 
                 if wallReady
                     ctx.drawImage(wallImage, i, j)
@@ -82,18 +105,19 @@ class Grid
         return
         
             
-hero = new Player("Nogrelin", "Death Knight")
+hero = new Player("Nogrelin", "Death Knight", 1, 1)
+ogre = new Ogre("Ogrelin", 3,3)
 grid = new Grid(7,7)
 
 actors = [
     hero
-    #enemy
+    ogre
     ]
 
 canvas = document.createElement("canvas")
 ctx = canvas.getContext("2d")
-canvas.width = window.innerWidth# 640
-canvas.height = window.innerHeight# 480
+canvas.width = window.innerWidth-20# 640
+canvas.height = window.innerHeight-20# 480
 document.body.appendChild(canvas)
 
 floorReady = false
@@ -117,6 +141,12 @@ playerImage.onload = ->
     return
 playerImage.src = "images/Nogrelin.png" #Player
 
+ogreReady = false
+ogreImage = new Image()
+ogreImage.onload = ->
+    ogreReady = true
+    return
+ogreImage.src = "images/Ogre.png" #Ogre
 
 keysDown = {}
 actionAvailable = true
@@ -160,16 +190,14 @@ render = ->
     grid.emptyGrid()
     grid.populateGrid(actors)
 
-    # should be: draw background (floor and walls)
-    for i in [0..grid.maxWidth-1]
-        for j in [0..grid.maxHeight-1]
-            grid.draw(i,j) 
+    # for i in [0..grid.maxWidth-1]
+    #     for j in [0..grid.maxHeight-1]
+    #         grid.draw(i,j, hero.seeRange) 
   
-    # for i in [hero.x-1..hero.x+1]
-    #     for j in [hero.y-1..hero.y+1]
-    #         grid.draw(i,j)
-
-    # then: draw actors ontop of current layer
+    for i in [hero.x-hero.seeRange..hero.x+hero.seeRange]
+        for j in [hero.y-hero.seeRange..hero.y+hero.seeRange]
+            grid.draw(i,j, hero.x-hero.seeRange, hero.y-hero.seeRange)
+ 
     return
 
 main = ->
