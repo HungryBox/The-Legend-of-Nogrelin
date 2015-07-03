@@ -20,7 +20,7 @@ class Actor
         return
     
 class Player extends Actor
-    seeRange: 1
+    seeRange: 2
     constructor: (@name, @type, @x, @y) ->
         super(@x, @y)
         return
@@ -75,18 +75,19 @@ class Grid
     draw: (x,y,xmin, ymin) ->
         i = (x-xmin) * @grid[0][0].size
         j = (y-ymin) * @grid[0][0].size
-        if floorReady
-            ctx.drawImage(floorImage,i,j)        
-        switch @grid[x][y].getSpace()
-            when GridCodes.ogre
-                if ogreReady
-                    ctx.drawImage(ogreImage, i, j)
-            when GridCodes.wall 
-                if wallReady
-                    ctx.drawImage(wallImage, i, j)
-            when GridCodes.player
-                if playerReady
-                    ctx.drawImage(playerImage, i, j)
+        if x>=0 and y>=0 and x<@maxWidth and y<@maxHeight
+            if floorReady
+                ctx.drawImage(floorImage,i,j)        
+            switch @grid[x][y].getSpace()
+                when GridCodes.ogre
+                    if ogreReady
+                        ctx.drawImage(ogreImage, i, j)
+                when GridCodes.wall 
+                    if wallReady
+                        ctx.drawImage(wallImage, i, j)
+                when GridCodes.player
+                    if playerReady
+                        ctx.drawImage(playerImage, i, j)
         return        
             
 hero = new Player("Nogrelin", "Death Knight", 1, 1)

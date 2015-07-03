@@ -28,7 +28,7 @@
   Player = (function(superClass) {
     extend(Player, superClass);
 
-    Player.prototype.seeRange = 1;
+    Player.prototype.seeRange = 2;
 
     function Player(name, type, x1, y1) {
       this.name = name;
@@ -168,24 +168,26 @@
       var i, j;
       i = (x - xmin) * this.grid[0][0].size;
       j = (y - ymin) * this.grid[0][0].size;
-      if (floorReady) {
-        ctx.drawImage(floorImage, i, j);
-      }
-      switch (this.grid[x][y].getSpace()) {
-        case GridCodes.ogre:
-          if (ogreReady) {
-            ctx.drawImage(ogreImage, i, j);
-          }
-          break;
-        case GridCodes.wall:
-          if (wallReady) {
-            ctx.drawImage(wallImage, i, j);
-          }
-          break;
-        case GridCodes.player:
-          if (playerReady) {
-            ctx.drawImage(playerImage, i, j);
-          }
+      if (x >= 0 && y >= 0 && x < this.maxWidth && y < this.maxHeight) {
+        if (floorReady) {
+          ctx.drawImage(floorImage, i, j);
+        }
+        switch (this.grid[x][y].getSpace()) {
+          case GridCodes.ogre:
+            if (ogreReady) {
+              ctx.drawImage(ogreImage, i, j);
+            }
+            break;
+          case GridCodes.wall:
+            if (wallReady) {
+              ctx.drawImage(wallImage, i, j);
+            }
+            break;
+          case GridCodes.player:
+            if (playerReady) {
+              ctx.drawImage(playerImage, i, j);
+            }
+        }
       }
     };
 
