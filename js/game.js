@@ -28,7 +28,7 @@
   Player = (function(superClass) {
     extend(Player, superClass);
 
-    Player.prototype.seeRange = 2;
+    Player.prototype.seeRange = 5;
 
     function Player(name, type, x1, y1) {
       this.name = name;

@@ -20,7 +20,7 @@ class Actor
         return
     
 class Player extends Actor
-    seeRange: 2
+    seeRange: 5
     constructor: (@name, @type, @x, @y) ->
         super(@x, @y)
         return
