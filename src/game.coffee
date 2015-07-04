@@ -46,6 +46,8 @@ class Ogre extends Enemy
         return
     toGridSpace: ->
         return GridCodes.ogre
+    getName: ->
+        "#{@name} the Ogre"
 
 class GridSpace
     size: 128
@@ -75,6 +77,8 @@ class Grid
     draw: (x,y,xmin, ymin) ->
         i = (x-xmin) * @grid[0][0].size
         j = (y-ymin) * @grid[0][0].size
+        if bgReady
+            ctx.drawImage(bgImage,i,j)
         if x>=0 and y>=0 and x<@maxWidth and y<@maxHeight
             if floorReady
                 ctx.drawImage(floorImage,i,j)        
@@ -102,8 +106,15 @@ actors = [
 canvas = document.createElement("canvas")
 ctx = canvas.getContext("2d")
 canvas.width = (hero.seeRange*2+1)*128
-canvas.height = (hero.seeRange*2+1)*128
+canvas.height = (hero.seeRange*2+1)*128 
 document.body.appendChild(canvas)
+
+bgReady = false
+bgImage = new Image()
+bgImage.onload = ->
+    bgReady = true
+    return
+bgImage.src = "images/Background.png"    
 
 floorReady = false
 floorImage = new Image()
@@ -175,18 +186,26 @@ update = ->
             when 1
                 if grid.getGridSpace(ogre.x, ogre.y-1) == GridCodes.floor
                     ogre.y-=1
+                else if grid.getGridSpace(ogre.x, ogre.y-1) == GridCodes.player
+                    console.log "#{ogre.getName()} attacked #{hero.getName()}"
                 enemyActionAvailable = false
             when 2
                 if grid.getGridSpace(ogre.x, ogre.y+1) == GridCodes.floor
                     ogre.y+=1
+                else if grid.getGridSpace(ogre.x, ogre.y+1) == GridCodes.player
+                    console.log "#{ogre.getName()} attacked #{hero.getName()}"
                 enemyActionAvailable = false
             when 3
                 if grid.getGridSpace(ogre.x-1, ogre.y) == GridCodes.floor
                     ogre.x-=1
+                else if grid.getGridSpace(ogre.x-1, ogre.y) == GridCodes.player
+                    console.log "#{ogre.getName()} attacked #{hero.getName()}"
                 enemyActionAvailable = false
             when 4
                 if grid.getGridSpace(ogre.x+1, ogre.y) == GridCodes.floor
                     ogre.x+=1
+                else if grid.getGridSpace(ogre.x+1, ogre.y) == GridCodes.player
+                    console.log "#{ogre.getName()} attacked #{hero.getName()}"
                 enemyActionAvailable = false
     return
 render = ->
