@@ -18,7 +18,7 @@ class Actor
         return
     toGridSpace: ->
         return
-    
+
 class Player extends Actor
     seeRange: 5
     constructor: (@name, @type, @x, @y) ->
@@ -81,19 +81,19 @@ class Grid
             ctx.drawImage(bgImage,i,j)
         if x>=0 and y>=0 and x<@maxWidth and y<@maxHeight
             if floorReady
-                ctx.drawImage(floorImage,i,j)        
+                ctx.drawImage(floorImage,i,j)
             switch @grid[x][y].getSpace()
                 when GridCodes.ogre
                     if ogreReady
                         ctx.drawImage(ogreImage, i, j)
-                when GridCodes.wall 
+                when GridCodes.wall
                     if wallReady
                         ctx.drawImage(wallImage, i, j)
                 when GridCodes.player
                     if playerReady
                         ctx.drawImage(playerImage, i, j)
-        return        
-            
+        return
+
 hero = new Player("Nogrelin", "Death Knight", 1, 1)
 ogre = new Ogre("Ogrelin",2,2)
 grid = new Grid(7,7)
@@ -105,8 +105,8 @@ actors = [
 
 canvas = document.createElement("canvas")
 ctx = canvas.getContext("2d")
-canvas.width = (hero.seeRange*2+1)*128
-canvas.height = (hero.seeRange*2+1)*128 
+canvas.width = window.innerWidth - 20#(hero.seeRange*2+1)*128
+canvas.height = window.innerHeight - 20#(hero.seeRange*2+1)*128
 document.body.appendChild(canvas)
 
 bgReady = false
@@ -114,7 +114,7 @@ bgImage = new Image()
 bgImage.onload = ->
     bgReady = true
     return
-bgImage.src = "images/Background.png"    
+bgImage.src = "images/Background.png"
 
 floorReady = false
 floorImage = new Image()
@@ -170,15 +170,15 @@ update = ->
     if 40 of keysDown && playerActionAvailable
         if grid.getGridSpace(hero.x, hero.y+1) == GridCodes.floor
             hero.y+=1
-        playerActionAvailable = false            
+        playerActionAvailable = false
     if 37 of keysDown && playerActionAvailable
         if grid.getGridSpace(hero.x-1, hero.y) == GridCodes.floor
             hero.x-=1
-        playerActionAvailable = false            
+        playerActionAvailable = false
     if 39 of keysDown && playerActionAvailable
         if grid.getGridSpace(hero.x+1, hero.y) == GridCodes.floor
             hero.x+=1
-            playerActionAvailable = false                
+            playerActionAvailable = false
 
     if enemyActionAvailable
         num = Math.floor(Math.random()*4+1)
@@ -210,19 +210,19 @@ update = ->
     return
 render = ->
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     # draw the 3x3 grid area around the hero
     grid.emptyGrid()
     grid.populateGrid(actors)
 
     # for i in [0..grid.maxWidth-1]
     #     for j in [0..grid.maxHeight-1]
-    #         grid.draw(i,j, hero.seeRange) 
-  
+    #         grid.draw(i,j, hero.seeRange)
+
     for i in [hero.x-hero.seeRange..hero.x+hero.seeRange]
         for j in [hero.y-hero.seeRange..hero.y+hero.seeRange]
             grid.draw(i,j, hero.x-hero.seeRange, hero.y-hero.seeRange)
- 
+
     return
 
 main = ->

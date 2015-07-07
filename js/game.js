@@ -214,9 +214,9 @@
 
   ctx = canvas.getContext("2d");
 
-  canvas.width = (hero.seeRange * 2 + 1) * 128;
+  canvas.width = window.innerWidth - 20;
 
-  canvas.height = (hero.seeRange * 2 + 1) * 128;
+  canvas.height = window.innerHeight - 20;
 
   document.body.appendChild(canvas);
 
